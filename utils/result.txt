@@ -1,0 +1,38 @@
+setting  
+mse:1, mae:1, rmse:1, mape:1, mspe:1, rse:1, corr:1
+
+setting  
+mse:1
+, mae:1
+, rse:1
+, corr:1
+
+
+setting  
+mse:1
+  mae:1
+ rse:1
+ corr:1
+
+
+setting  
+mse:1
+ mae:1
+ rse:1
+ corr:1
+
+
+setting  
+	mse:1
+	mae:1
+	rse:1
+	corr:1
+
+
+setting  
+ mse:1
+ mae:1
+ rse:1
+ corr:1
+
+

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction</title>
+    <style>
+      html,body,#app{
+        height:100%;
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+</head>
+<body>
+<el-container id="base" style="height:100vh; ">
+    <el-header style="background-color: rgb(36,164,208);" >
+           <h1 style="font-family: Arial, sans-serif; font-size: 22px; text-align: center;">
+            <strong>Prediction Given By Deep Learning</strong>
+           </h1>
+    </el-header>
+    <el-container >
+            <el-aside width="30%" style="background-color:  rgba(164,193,224,0.94);">
+          <div style="background-color: rgba(0,123,255,0.38); color: white;padding: 10px;text-align: center; ">
+                        <h2><strong style="align-content: center">PREDICTION</strong></h2>
+                      </div>
+                <br>
+                        <h3 style="text-align:center;color:white;">
+                            Prediction File
+                        </h3>
+                 <br>
+                 <br>
+                        <div style="text-align: center;">
+                            <el-upload class="upload-demo" ref="upload" action="/upload_file"    :on-change="handleChange" :on-preview="handlePreview" :on-remove="handleRemove" :before-remove="beforeRemove" :file-list="fileList" :auto-upload="false" :on-success="uploadSuccess" accept=".csv">
+                                <el-button slot="trigger" size="medium" type="primary" icon="el-icon-folder-opened">
+                                    选择文件
+                                </el-button>
+                                <el-button size="medium" type="success" @click="submitUpload" icon="el-icon-upload">
+                                    {#                                    <a href="/prediction" style="text-decoration: none; color: inherit;cursor: pointer;">el-icon-warning-outlin#}
+                                    上传到服务器
+                                    {#                                </a>#}
+                                </el-button>
+                                <div slot="tip" class="el-upload__tip" style="color: #bf00ff"><i
+                                        class="el-icon-warning-outline"></i>只能上传csv文件
+                                </div>
+                            </el-upload>
+                        </div>
+                <br>
+                <div style="text-align: center;">
+                </div>
+             </el-aside>
+        <el-main width="70%" style="background-color:  rgb(255,255,255); ">
+            <div v-if="!fileUploaded">
+                    <p style="text-align:center;margin-top:18%">
+                    <i class="el-icon-s-tools" style="color: #ADD8E6; font-size: 200px"></i>
+                    <br/>
+                    <br/>
+             <strong style="font-size:70px">
+                Preparing for  Analysis
+           </strong>
+                </p>
+            </div>
+            <div v-else>
+            <el-collapse v-model="activeNames" @change="handleChange2">
+                <el-collapse-item name="1" >
+                    <div slot="title" style="font-size: 16px; color: #68a8ec;">
+                        Model Introduction
+                    </div>
+                    <div>我们采用独立通道编码的方式，这样可以更好地保留数据的特征和意义，提高模型对不同时间序列数据的处理能力。
+                    </div>
+                    <div>我们对Informer模型的架构进行了改进，采用了仅包含Encoder模块而不使用Decoder模块的设计。移除Decoder模块的设计使得模型结构更加简洁清晰，减少了不必要的复杂性。</div>
+                    <div class="demo-image__placeholder" style="text-align: center">
+                        <div class="block" style="text-align: center">
+                            <h3 class="demonstration">vInformer结构图:</h3>
+                            <el-image src="./static/vInformerIntroduction/4.jpg" style="width: 70%; height: 30%"
+                                      fill></el-image>
+                        </div>
+                    </div>
+                </el-collapse-item>
+                <el-collapse-item name="2">
+                     <div slot="title" style="font-size: 16px;  color: #68a8ec;">
+                        Prediction Results Display
+                    </div>
+                    <div v-if="!fileUploaded" >
+                        <!-- 在没有选择文件的情况下显示的内容 -->
+                        <el-empty description="没有数据，请上传文件"></el-empty>
+                    </div>
+                    <div v-else >
+                        <div v-loading="tableLoading" element-loading-text="拼命加载中"
+                             element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">
+                            <!-- 在这里渲染 ECharts 图表 -->
+                            <div ref="echarts" style="width: 100%; height: 600px;">
+                            </div>
+                        </div>
+                    </div>
+                </el-collapse-item>
+                <el-collapse-item name="3">
+                    <div slot="title" style="font-size: 16px; color: #68a8ec;">
+                        Model Evaluation
+                    </div>
+                    <p>下表显示了模型的均方根误差、均方误差，值越低越好。</p>
+                    <el-table v-if="tableData.length >0" :data="tableData" :highlight-current-row="true" :border="true"
+                              :stripe="false" :fit="true" :size="medium" style="width: 100%">
+                        <el-table-column prop="Model" label="Model" height="30%"></el-table-column>
+                        <el-table-column prop="RMSE" label="RMSE" height="35%"></el-table-column>
+                        <el-table-column prop="MSE" label="MSE" height="35%"></el-table-column>
+                    </el-table>
+                </el-collapse-item>
+            </el-collapse>
+            </div>
+        </el-main>
+    </el-container>
+     <el-footer style="height:2.5%;background: #3e5873;text-align: center" >
+            <strong style="text-align: center;vertical-align: center" >Prediction System V1.0</strong>
+      </el-footer>
+</el-container>
+    <link rel="stylesheet" href="/static/vue/element-ui@2.15.14_lib_theme-chalk_index.css">
+    <script src="/static/vue/vue.js"></script>
+    <script src="/static/vue/element-ui@2.15.14_lib_index.js"></script>
+    <script src="/static/vue/axios.min.js"></script>
+    <script src="/static/vue/echarts_5.4.3_echarts.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="/static/js/base.js" ></script>
+</body>
+</html>
+
